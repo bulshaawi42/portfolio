@@ -121,7 +121,7 @@ h1, h2, h3, p { margin-top: 0; }
 .map-street { position: absolute; width: 135%; height: 2px; background: rgba(73,104,86,.32); }
 .street-a { top: 35%; left: -14%; transform: rotate(28deg); }.street-b { top: 71%; left: -12%; transform: rotate(-18deg); }.street-c { top: 47%; left: -13%; transform: rotate(69deg); }
 .card-route { position: absolute; inset: 20% 5% 12%; width: 90%; height: 67%; overflow: visible; }
-.card-route path { stroke: #e95e40; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 11 9; filter: drop-shadow(0 2px 2px rgba(233,94,64,.18)); animation: route-flow 16s linear infinite; }
+.card-route path { fill: none; stroke: #e95e40; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 11 9; filter: drop-shadow(0 2px 2px rgba(233,94,64,.18)); animation: route-flow 16s linear infinite; }
 .map-pin { position: absolute; z-index: 2; display: grid; width: 1.55rem; height: 1.55rem; place-items: center; border: 2px solid #fbf7eb; border-radius: 50%; background: var(--coral); color: white; font: 500 .55rem var(--mono); box-shadow: 0 4px 12px rgba(26,37,28,.22); }
 .map-pin-a { top: 67%; left: 13%; }.map-pin-b { top: 36%; right: 14%; background: var(--ink); }
 .map-tooltip { position: absolute; right: 8%; bottom: 13%; display: flex; gap: .7rem; align-items: center; padding: .55rem .65rem; background: #fcfaf3; color: #454941; font-size: .48rem; box-shadow: 0 8px 20px rgba(30,40,30,.13); }

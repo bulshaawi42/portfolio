@@ -1,34 +1,9 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const navigation = document.querySelector(".navigation");
 const year = document.querySelector("#year");
-
-if (year) {
-  year.textContent = String(new Date().getFullYear());
-}
-
 const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
-const revealTargets = document.querySelectorAll(
-  ".about-content, .systems-heading, .systems-note, .expertise-heading, .expertise-card, .statement p, .contact-panel",
-);
 
-if (!motionPreference.matches && "IntersectionObserver" in window) {
-  document.documentElement.classList.add("motion-ready");
-  revealTargets.forEach((target) => target.classList.add("reveal"));
-
-  const revealObserver = new IntersectionObserver(
-    (entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.14, rootMargin: "0px 0px -36px 0px" },
-  );
-
-  revealTargets.forEach((target) => revealObserver.observe(target));
-}
+if (year) year.textContent = String(new Date().getFullYear());
 
 if (menuToggle && navigation) {
   const closeMenu = () => {
@@ -45,84 +20,64 @@ if (menuToggle && navigation) {
   });
 
   navigation.addEventListener("click", (event) => {
-    if (event.target instanceof HTMLAnchorElement) {
-      closeMenu();
-    }
+    if (event.target instanceof HTMLAnchorElement) closeMenu();
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
       closeMenu();
       menuToggle.focus();
     }
   });
 }
 
-const finePointer = window.matchMedia("(pointer: fine)");
-const pageSections = document.querySelectorAll("main section[id]");
-const primaryLinks = navigation?.querySelectorAll('a[href^="#"]') ?? [];
-
-if ("IntersectionObserver" in window && primaryLinks.length) {
-  const activeSectionObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        primaryLinks.forEach((link) => {
-          const active = link.getAttribute("href") === `#${entry.target.id}`;
-          if (active) link.setAttribute("aria-current", "location");
-          else link.removeAttribute("aria-current");
-          link.classList.toggle("is-active", active);
-        });
-      });
-    },
-    { rootMargin: "-25% 0px -62% 0px", threshold: 0 },
-  );
-
-  pageSections.forEach((section) => activeSectionObserver.observe(section));
+const revealTargets = document.querySelectorAll(".reveal");
+if (!motionPreference.matches && "IntersectionObserver" in window && revealTargets.length) {
+  document.documentElement.classList.add("motion-ready");
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -35px 0px" });
+  revealTargets.forEach((target) => revealObserver.observe(target));
 }
 
 if (!motionPreference.matches) {
   let scrollFrame = 0;
-  const updateScrollProgress = () => {
+  const updateProgress = () => {
     const scrollable = document.documentElement.scrollHeight - window.innerHeight;
     const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
     document.documentElement.style.setProperty("--scroll-progress", String(progress));
     scrollFrame = 0;
   };
+  window.addEventListener("scroll", () => {
+    if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateProgress);
+  }, { passive: true });
+  updateProgress();
 
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (scrollFrame) return;
-      scrollFrame = window.requestAnimationFrame(updateScrollProgress);
-    },
-    { passive: true },
-  );
-  updateScrollProgress();
-
-  if (finePointer.matches) {
-    const heroArt = document.querySelector(".hero-art");
-    heroArt?.addEventListener("pointermove", (event) => {
-      const bounds = heroArt.getBoundingClientRect();
-      const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-      const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-      heroArt.style.setProperty("--hero-shift-x", `${x * 10}px`);
-      heroArt.style.setProperty("--hero-shift-y", `${y * 10}px`);
+  if (window.matchMedia("(pointer: fine)").matches) {
+    const visual = document.querySelector(".hero-visual");
+    visual?.addEventListener("pointermove", (event) => {
+      const rect = visual.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      visual.style.setProperty("--px", `${x * 2.6}deg`);
+      visual.style.setProperty("--py", `${-y * 2.6}deg`);
     });
-    heroArt?.addEventListener("pointerleave", () => {
-      heroArt.style.setProperty("--hero-shift-x", "0px");
-      heroArt.style.setProperty("--hero-shift-y", "0px");
+    visual?.addEventListener("pointerleave", () => {
+      visual.style.setProperty("--px", "0deg");
+      visual.style.setProperty("--py", "0deg");
     });
 
-    document.querySelectorAll(".system-card").forEach((card) => {
+    document.querySelectorAll(".work-card").forEach((card) => {
       card.addEventListener("pointermove", (event) => {
-        const bounds = card.getBoundingClientRect();
-        const x = (event.clientX - bounds.left) / bounds.width;
-        const y = (event.clientY - bounds.top) / bounds.height;
-        card.style.setProperty("--pointer-x", `${x * 100}%`);
-        card.style.setProperty("--pointer-y", `${y * 100}%`);
-        card.style.setProperty("--tilt-x", `${(x - 0.5) * 5}deg`);
-        card.style.setProperty("--tilt-y", `${(0.5 - y) * 5}deg`);
+        const rect = card.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        card.style.setProperty("--tilt-x", `${(x - 0.5) * 3}deg`);
+        card.style.setProperty("--tilt-y", `${(0.5 - y) * 3}deg`);
       });
       card.addEventListener("pointerleave", () => {
         card.style.setProperty("--tilt-x", "0deg");
